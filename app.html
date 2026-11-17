@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gestion Stock Pro</title>
+<style>
+:root{--bg:#eef3f0;--cd:#fff;--tx:#14231b;--mu:#6a7f74;--pr:#0f8a4f;--ok:#0f8a4f;--wa:#c27a06;--er:#d93a3a;--bd:#e3ebe6;--sf:#e4f3ea;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1d1f;--cd:#162a2c;--tx:#e8f3ee;--mu:#8fb0a4;--pr:#22c55e;--ok:#34d27b;--bd:#244240;--sf:#1d3836;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e1d1f;--cd:#162a2c;--tx:#e8f3ee;--mu:#8fb0a4;--pr:#22c55e;--ok:#34d27b;--bd:#244240;--sf:#1d3836;color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}body{background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding-bottom:84px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--pr);z-index:10}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--pr);color:#fff;padding:12px 16px;display:flex;align-items:center;gap:10px}
+header h1{font-size:18px;margin:0;flex:1}header button{background:#ffffff26;color:#fff;border:0;border-radius:10px;padding:6px 12px;font:inherit}
+main{padding:14px;max-width:720px;margin:auto}
+.card{background:var(--cd);border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px #14143c14;border:1px solid var(--bd)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}.grid .card{margin:0}
+.k{color:var(--mu);font-size:12px}.v{font-size:20px;font-weight:700;margin-top:2px}.v.s{font-size:16px}
+.row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--bd)}.row:last-child{border:0}
+.row .g{flex:1;min-width:0}.row b,.row small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}small,.mu{color:var(--mu);font-size:12.5px}
+.tag{border-radius:99px;padding:2px 9px;font-size:12px;font-weight:600;background:var(--sf);white-space:nowrap}.ok{color:var(--ok)}.wa{color:var(--wa)}.er{color:var(--er)}
+input,select,textarea{width:100%;font:inherit;color:var(--tx);background:var(--cd);border:1px solid var(--bd);border-radius:10px;padding:11px 12px;margin:4px 0 10px}
+label{font-size:12.5px;color:var(--mu);font-weight:600}
+.btn{border:0;border-radius:11px;background:var(--pr);color:#fff;font:inherit;font-weight:600;padding:12px 16px;width:100%}
+.btn.s{width:auto;padding:8px 14px}.btn.g{background:var(--sf);color:var(--tx)}.btn.d{background:var(--er)}.btn.o{background:var(--ok)}
+.bar{display:flex;gap:8px;margin-bottom:10px}.bar>*{margin:0!important}.seg{display:flex;gap:6px;margin-bottom:10px}.seg button{flex:1;border:1px solid var(--bd);background:var(--cd);color:var(--tx);border-radius:10px;padding:10px 4px;font:inherit}.seg button.on{background:var(--pr);color:#fff;border-color:var(--pr)}
+nav{position:fixed;bottom:0;left:0;right:0;background:var(--cd);border-top:1px solid var(--bd);display:flex;padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));z-index:9}
+nav button{flex:1;background:0;border:0;color:var(--mu);font:inherit;font-size:11px;padding:4px 0;display:flex;flex-direction:column;align-items:center;gap:2px}nav button span{font-size:20px}nav button.on{color:var(--pr);font-weight:700}
+#cartbar{position:fixed;left:12px;right:12px;bottom:calc(66px + env(safe-area-inset-bottom,0px));z-index:8}
+#ov{position:fixed;inset:0;background:#0008;z-index:20;display:none;align-items:flex-end;justify-content:center}#ov.on{display:flex}
+#sh{background:var(--bg);width:100%;max-width:720px;max-height:92vh;overflow:auto;border-radius:18px 18px 0 0;padding:16px 14px calc(20px + env(safe-area-inset-bottom,0px))}
+#sh h2{margin:0 0 12px;font-size:17px;display:flex;justify-content:space-between;align-items:center}
+#toast{position:fixed;top:calc(64px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);background:#1b1d2e;color:#fff;padding:10px 16px;border-radius:12px;z-index:30;display:none;max-width:90%;text-align:center}
+.qty{display:flex;align-items:center;gap:8px}.qty button{width:32px;height:32px;border-radius:9px;border:1px solid var(--bd);background:var(--cd);color:var(--tx);font-size:18px}
+.empty{text-align:center;color:var(--mu);padding:26px 0}pre{white-space:pre-wrap;font:13px/1.5 ui-monospace,Menlo,monospace;background:var(--cd);padding:12px;border-radius:12px;border:1px solid var(--bd)}
+video{width:100%;border-radius:12px;background:#000}
+body::before{background:var(--bg)}
+header{background:var(--bg);color:var(--tx);padding:16px 16px 8px}header h1{font-size:23px;font-weight:800}header button{background:var(--sf);color:var(--pr);font-weight:600}
+.card{border:0;border-radius:18px;box-shadow:0 2px 12px #0b3d2212}
+.grid .card{position:relative;padding-top:16px}.ic{width:34px;height:34px;border-radius:11px;background:var(--sf);display:grid;place-items:center;font-size:17px;margin-bottom:8px}
+.hero{background:linear-gradient(135deg,#12a05c,#0a6a3c);color:#fff;border-radius:22px;padding:18px;display:flex;justify-content:space-between;align-items:flex-end;gap:10px;margin-bottom:12px;box-shadow:0 8px 20px #0a6a3c33}.hero .k,.hero small{color:#ffffffcc}.hv{font-size:32px;font-weight:800;letter-spacing:-.5px;margin:2px 0}.hp{background:#ffffff26;border-radius:14px;padding:8px 12px;text-align:right;font-size:12px;white-space:nowrap}.hp b{display:block;font-size:16px}
+.tag{padding:3px 11px}.tag.ok{background:#d9f3e3;color:#0b7a42}.tag.wa{background:#fdefd3;color:#a86205}.tag.er{background:#fde2e2;color:#c52f2f}
+:root[data-theme="dark"] .tag.ok,:root:not([data-theme="light"]) .tag.ok{background:#12402c;color:#5ee39a}
+.btn{border-radius:14px;padding:13px 16px}.btn.o{background:var(--pr)}.seg button{border-radius:12px}.seg button.on{box-shadow:0 3px 10px #0f8a4f44}
+input:focus,select:focus{outline:2px solid var(--pr);border-color:transparent}.row[data-a]{cursor:pointer}
+nav{box-shadow:0 -4px 18px #0b3d2214;border-top:0}nav button.on span{background:var(--sf);border-radius:14px;padding:1px 16px}nav button.on{color:var(--pr)}
+@media(min-width:900px){body{padding:0 0 0 232px}nav{top:0;right:auto;width:232px;flex-direction:column;gap:4px;padding:20px 12px;box-shadow:none;border-right:1px solid var(--bd)}nav::before{content:"📦 Gestion Stock Pro";font-weight:800;font-size:17px;padding:2px 10px 20px;color:var(--pr)}nav button{flex:none;flex-direction:row;gap:12px;font-size:14.5px;padding:11px 12px;border-radius:12px;justify-content:flex-start}nav button.on{background:var(--sf)}nav button.on span{background:0;padding:0}main{max-width:1000px;padding:14px 28px}header{padding:22px 28px 6px}header h1{max-width:1000px}#cartbar{left:256px;right:24px;bottom:18px}.grid{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}#ov{align-items:center}#sh{border-radius:22px;max-width:560px;max-height:86vh}}
+</style></head><body>
+<header><h1 id="ttl">Accueil</h1><button id="hb" style="display:none">‹ Retour</button></header>
+<main id="app"></main><div id="cartbar"></div>
+<nav id="nav"></nav><div id="ov"><div id="sh"></div></div><div id="toast"></div>
+<script>
+const K='gsp-v1';let D=null;
+try{D=JSON.parse(window.desktop?window.desktop.load():localStorage.getItem(K))}catch(e){}
+D=D||{p:[],c:[],s:[],e:[],m:[],cfg:{name:'Mon magasin',low:5},n:1};
+const save=()=>{try{window.desktop?window.desktop.save(JSON.stringify(D)):localStorage.setItem(K,JSON.stringify(D))}catch(e){toast('Enregistrement impossible')}};
+const $=s=>document.querySelector(s),E=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const r2=n=>Math.round((+n+Number.EPSILON)*100)/100,M=n=>r2(n).toLocaleString('fr-FR')+' DA',nid=()=>D.n++;
+const pad=n=>String(n).padStart(2,'0'),dt=()=>{const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes())},td=()=>dt().slice(0,10);
+let T='home',V=null,cart=[],PAY={mt:'cash',cid:'',paid:'',disc:''},tt;
+const TABS=[['home','🏠','Accueil'],['pos','🛒','Caisse'],['prod','📦','Produits'],['cust','👥','Clients'],['more','☰','Plus']];
+function toast(m){const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(tt);tt=setTimeout(()=>t.style.display='none',2600)}
+function sheet(h,b){$('#sh').innerHTML=`<h2>${h}<button class="btn g s" data-a="close">✕</button></h2>${b}`;$('#ov').classList.add('on')}
+const closeSheet=()=>{stopCam();$('#ov').classList.remove('on')};
+const prod=id=>D.p.find(x=>x.id==id),cust=id=>D.c.find(x=>x.id==id);
+function mv(p,delta,t,n){p.q=Math.round((p.q+delta)*1000)/1000;D.m.unshift({id:nid(),pid:p.id,t,d:delta,q:p.q,n:n||'',at:dt()})}
+const bal=c=>r2(D.s.filter(s=>s.cid==c.id&&s.st=='ok').reduce((t,s)=>t+s.total-s.paid,0));
+const live=s=>D.s.filter(x=>x.st=='ok'&&(!s||x.at.startsWith(s)));
+const profit=ss=>r2(ss.reduce((t,s)=>t+s.total-s.items.reduce((a,i)=>a+i.q*i.cost,0),0));
+const MT={cash:'Espèces',ccp:'CCP / banque',credit:'Crédit'};
+const empty=t=>`<div class="empty">${t}</div>`;
+
+/* ---------- vues ---------- */
+const views={
+home(){const t=td(),ss=live(t),low=D.p.filter(p=>p.q<=p.min),debt=D.c.reduce((a,c)=>a+bal(c),0),sv=D.p.reduce((a,p)=>a+Math.max(p.q,0)*p.pp,0);
+ return `<div class="hero"><div><div class="k">Bonjour 👋 Ventes aujourd’hui</div><div class="hv">${M(ss.reduce((a,s)=>a+s.total,0))}</div><small>${ss.length} vente(s) · ${new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})}</small></div><div class="hp">Bénéfice du jour<b>${M(profit(ss))}</b></div></div><div class="grid">
+ <div class="card"><div class="ic">📈</div><div class="k">Bénéfice du mois</div><div class="v s ok">${M(profit(live(t.slice(0,7))))}</div></div>
+ <div class="card"><div class="ic">📦</div><div class="k">Produits</div><div class="v">${D.p.length}</div></div>
+ <div class="card"><div class="ic">💰</div><div class="k">Valeur du stock</div><div class="v s">${M(sv)}</div></div>
+ <div class="card"><div class="ic">👥</div><div class="k">Dettes clients</div><div class="v s er">${M(debt)}</div></div>
+ <div class="card"><div class="ic">⚠️</div><div class="k">Stock bas</div><div class="v ${low.length?'wa':''}">${low.length}</div></div></div>
+ <div class="bar"><button class="btn" data-a="tab" data-i="pos">🛒 Nouvelle vente</button><button class="btn g" data-a="pform">＋ Produit</button></div>
+ <div class="card"><b>Alertes stock bas</b>${low.length?low.slice(0,8).map(p=>`<div class="row"><div class="g"><b>${E(p.name)}</b><small>Seuil : ${p.min}</small></div><span class="tag ${p.q<=0?'er':'wa'}">${p.q<=0?'Rupture':p.q+' restant(s)'}</span></div>`).join(''):empty('Aucune alerte 👍')}</div>
+ <div class="card"><b>Dernières ventes</b>${D.s.slice(0,6).map(s=>`<div class="row" data-a="sale" data-i="${s.id}"><div class="g"><b>${s.no}</b><small>${s.at.slice(5)} · ${MT[s.mt]}${s.st=='x'?' · annulée':''}</small></div><b>${M(s.total)}</b></div>`).join('')||empty('Pas encore de vente')}</div>`},
+pos(){return `<div class="bar"><input id="qs" placeholder="Nom ou code-barres…" autocomplete="off"><button class="btn g s" data-a="cam">📷</button></div><div class="card" id="ql"></div>`},
+prod(){return `<div class="bar"><input id="qs" placeholder="Rechercher un produit…"><button class="btn s" data-a="pform">＋</button></div>
+ <div class="seg"><button data-a="pf" data-i="" class="${PF?'':'on'}">Tous</button><button data-a="pf" data-i="1" class="${PF?'on':''}">Stock bas</button></div><div class="card" id="ql"></div>`},
+cust(){return `<div class="bar"><input id="qs" placeholder="Rechercher un client…"><button class="btn s" data-a="cform">＋</button></div><div class="card" id="ql"></div>`},
+more(){return [['sales','🧾','Historique des ventes'],['exp','💸','Dépenses'],['rep','📊','Rapports'],['bk','💾','Sauvegarde et restauration'],['cfg','⚙️','Paramètres']].map(x=>`<div class="card row" data-a="sub" data-i="${x[0]}"><span style="font-size:22px">${x[1]}</span><div class="g"><b>${x[2]}</b></div>›</div>`).join('')}
+};
+let PF=false;
+const subs={
+sales(){return `<input id="qs" placeholder="Rechercher (n°, client)…"><div class="card" id="ql"></div>`},
+exp(){const m=td().slice(0,7),l=D.e.filter(e=>e.at.startsWith(m));return `<button class="btn" data-a="eform">＋ Ajouter une dépense</button><div class="card" style="margin-top:12px"><div class="k">Total du mois</div><div class="v er">${M(l.reduce((a,e)=>a+e.amt,0))}</div></div><div class="card">${D.e.map(e=>`<div class="row"><div class="g"><b>${E(e.label)}</b><small>${e.at}${e.cat?' · '+E(e.cat):''}</small></div><b>${M(e.amt)}</b><button class="btn g s" data-a="edel" data-i="${e.id}">🗑</button></div>`).join('')||empty('Aucune dépense')}</div>`},
+rep(){return `<div class="seg"><button data-a="rmode" data-i="d" class="${RM=='d'?'on':''}">Jour</button><button data-a="rmode" data-i="m" class="${RM=='m'?'on':''}">Mois</button></div><input id="rd" type="${RM=='d'?'date':'month'}" value="${RM=='d'?RD:RD.slice(0,7)}"><div id="rb">${repBody()}</div>`},
+bk(){return `<div class="card"><b>Sauvegarde</b><p class="mu">Vos données sont dans ce navigateur, sur ce téléphone. Exportez régulièrement un fichier de sauvegarde.</p><button class="btn" data-a="export">Exporter la sauvegarde</button></div><div class="card"><b>Restaurer</b><p class="mu">Choisissez un fichier exporté précédemment. Les données actuelles seront remplacées.</p><input type="file" id="imp" accept=".json,application/json"></div>`},
+cfg(){return `<div class="card"><label>Nom du magasin (sur les tickets)</label><input id="c_name" value="${E(D.cfg.name)}"><label>Seuil de stock bas par défaut</label><input id="c_low" type="number" min="0" value="${D.cfg.low}"><button class="btn" data-a="csave">Enregistrer</button></div><div class="card"><b>Zone dangereuse</b><p class="mu">Efface toutes les données de cette application.</p><button class="btn d" data-a="reset">Tout effacer</button></div>`}
+};
+const TT={sales:'Historique des ventes',exp:'Dépenses',rep:'Rapports',bk:'Sauvegarde',cfg:'Paramètres'};
+let RM='d',RD=td();
+function repBody(){const k=RM=='d'?RD:RD.slice(0,7),ss=live(k),ex=D.e.filter(e=>e.at.startsWith(k)).reduce((a,e)=>a+e.amt,0),rev=ss.reduce((a,s)=>a+s.total,0),pr=profit(ss),by={};
+ ss.forEach(s=>s.items.forEach(i=>{by[i.name]=(by[i.name]||0)+i.q}));const top=Object.entries(by).sort((a,b)=>b[1]-a[1]).slice(0,8);
+ return `<div class="grid"><div class="card"><div class="k">Chiffre d’affaires</div><div class="v s">${M(rev)}</div><small>${ss.length} vente(s)</small></div><div class="card"><div class="k">Bénéfice brut</div><div class="v s ok">${M(pr)}</div></div><div class="card"><div class="k">Dépenses</div><div class="v s er">${M(ex)}</div></div><div class="card"><div class="k">Bénéfice net</div><div class="v s">${M(pr-ex)}</div></div></div>
+ <div class="card"><b>Meilleures ventes</b>${top.map(t=>`<div class="row"><div class="g">${E(t[0])}</div><b>${t[1]}</b></div>`).join('')||empty('Aucune vente sur la période')}</div>`}
+
+/* ---------- listes dynamiques ---------- */
+function fill(){const l=$('#ql');if(!l)return;const s=($('#qs')?.value||'').trim().toLowerCase();let h='';
+ if(V=='sales'){const a=D.s.filter(x=>!s||(x.no+(cust(x.cid)?.name||'')).toLowerCase().includes(s)).slice(0,150);h=a.map(x=>`<div class="row" data-a="sale" data-i="${x.id}"><div class="g"><b>${x.no} ${x.st=='x'?'<span class="tag er">annulée</span>':''}</b><small>${x.at} · ${MT[x.mt]}${cust(x.cid)?' · '+E(cust(x.cid).name):''}</small></div><b>${M(x.total)}</b></div>`).join('')}
+ else if(T=='pos'){const a=D.p.filter(p=>!s||p.name.toLowerCase().includes(s)||(p.bc||'').includes(s)).slice(0,40);h=a.map(p=>`<div class="row" data-a="add" data-i="${p.id}"><div class="g"><b>${E(p.name)}</b><small>Stock : ${p.q}</small></div><b>${M(p.sp)}</b><span class="btn s">＋</span></div>`).join('')}
+ else if(T=='prod'){const a=D.p.filter(p=>(!s||p.name.toLowerCase().includes(s)||(p.bc||'').includes(s)||(p.cat||'').toLowerCase().includes(s))&&(!PF||p.q<=p.min));h=a.map(p=>`<div class="row" data-a="pdet" data-i="${p.id}"><div class="g"><b>${E(p.name)}</b><small>${p.cat?E(p.cat)+' · ':''}${p.bc?E(p.bc):'sans code'} · achat ${M(p.pp)}</small></div><div style="text-align:right"><b>${M(p.sp)}</b><br><span class="tag ${p.q<=0?'er':p.q<=p.min?'wa':'ok'}">${p.q}</span></div></div>`).join('')}
+ else if(T=='cust'){const a=D.c.filter(c=>!s||c.name.toLowerCase().includes(s)||(c.ph||'').includes(s));h=a.map(c=>{const b=bal(c);return `<div class="row" data-a="cdet" data-i="${c.id}"><div class="g"><b>${E(c.name)}</b><small>${E(c.ph||'')}</small></div><span class="tag ${b>0?'er':'ok'}">${b>0?M(b):'à jour'}</span></div>`}).join('')}
+ l.innerHTML=h||empty(T=='pos'||T=='prod'?'Aucun produit. Ajoutez-en depuis l’onglet Produits.':'Rien à afficher')}
+function cartBar(){const n=cart.reduce((a,i)=>a+i.q,0),t=cart.reduce((a,i)=>a+i.q*i.pr,0);$('#cartbar').innerHTML=T=='pos'&&n&&!V?`<button class="btn o" data-a="cart">Panier : ${n} article(s) · ${M(t)} →</button>`:''}
+function render(){V=V&&(subs[V])?V:null;$('#ttl').textContent=V?TT[V]:({home:D.cfg.name,pos:'Caisse',prod:'Produits & stock',cust:'Clients',more:'Plus'})[T];$('#hb').style.display=V?'':'none';
+ $('#app').innerHTML=V?subs[V]():views[T]();$('#nav').innerHTML=TABS.map(t=>`<button data-a="tab" data-i="${t[0]}" class="${T==t[0]&&!V?'on':''}"><span>${t[1]}</span>${t[2]}</button>`).join('');fill();cartBar();if(T=='pos'&&!V&&window.matchMedia&&matchMedia('(pointer:fine)').matches)$('#qs')?.focus()}
+
+/* ---------- formulaires ---------- */
+const F=(id,l,v,t,x)=>`<label>${l}</label><input id="${id}" type="${t||'text'}" value="${E(v)}" ${x||''}>`;
+function pform(id){const p=id?prod(id):{name:'',bc:'',cat:'',pp:'',sp:'',q:'',min:D.cfg.low};
+ sheet(id?'Modifier le produit':'Nouveau produit',F('f_n','Nom du produit *',p.name)+`<label>Code-barres</label><div class="bar"><input id="f_b" value="${E(p.bc)}" inputmode="numeric"><button class="btn g s" data-a="cam" data-i="f">📷</button></div>`+F('f_c','Catégorie',p.cat)+`<div class="bar"><div style="flex:1">${F('f_pp','Prix d’achat',p.pp,'number','inputmode="decimal" min="0"')}</div><div style="flex:1">${F('f_sp','Prix de vente *',p.sp,'number','inputmode="decimal" min="0"')}</div></div><div class="bar"><div style="flex:1">${F('f_q','Quantité',p.q,'number','inputmode="decimal" min="0"')}</div><div style="flex:1">${F('f_m','Seuil d’alerte',p.min,'number','min="0"')}</div></div><button class="btn" data-a="psave" data-i="${id||''}">Enregistrer</button>`)}
+function psave(id){const n=$('#f_n').value.trim(),b=$('#f_b').value.trim(),sp=+$('#f_sp').value,pp=+$('#f_pp').value||0,q=+$('#f_q').value||0;
+ if(!n)return toast('Le nom est obligatoire');if(!($('#f_sp').value!==''&&sp>=0))return toast('Indiquez le prix de vente');if(pp<0||q<0)return toast('Valeurs négatives interdites');
+ const dup=b&&D.p.find(p=>p.bc==b&&p.id!=id);if(dup)return toast('Code-barres déjà utilisé par « '+dup.name+' »');
+ let p=id?prod(id):null;if(p){Object.assign(p,{name:n,bc:b,cat:$('#f_c').value.trim(),pp,sp,min:+$('#f_m').value||0});if(q!=p.q)mv(p,q-p.q,'adj','Fiche produit')}
+ else{p={id:nid(),name:n,bc:b,cat:$('#f_c').value.trim(),pp,sp,q:0,min:+$('#f_m').value||0};D.p.push(p);if(q>0)mv(p,q,'in','Stock initial')}
+ save();closeSheet();render();toast('Produit enregistré')}
+function pdet(id){const p=prod(id),ms=D.m.filter(m=>m.pid==id).slice(0,12),N={in:'Entrée',out:'Sortie',adj:'Ajustement',sale:'Vente',ret:'Retour'};
+ sheet(E(p.name),`<div class="card"><div class="grid"><div><div class="k">En stock</div><div class="v">${p.q}</div></div><div><div class="k">Prix de vente</div><div class="v s">${M(p.sp)}</div></div></div><small>Achat ${M(p.pp)} · marge ${M(p.sp-p.pp)}${p.bc?' · '+E(p.bc):''}</small></div>
+ <div class="seg"><button data-a="smov" data-i="${id}" data-t="in">＋ Entrée</button><button data-a="smov" data-i="${id}" data-t="out">− Sortie</button><button data-a="smov" data-i="${id}" data-t="adj">Ajuster</button></div>
+ <div class="bar"><button class="btn g" data-a="pform" data-i="${id}">Modifier</button><button class="btn d" data-a="pdel" data-i="${id}">Supprimer</button></div>
+ <div class="card"><b>Historique du stock</b>${ms.map(m=>`<div class="row"><div class="g"><b>${N[m.t]}</b><small>${m.at}${m.n?' · '+E(m.n):''}</small></div><b class="${m.d<0?'er':'ok'}">${m.d>0?'+':''}${m.d}</b><small>→ ${m.q}</small></div>`).join('')||empty('Aucun mouvement')}</div>`)}
+function smov(id,t){const p=prod(id),L={in:'Quantité à ajouter',out:'Quantité à sortir',adj:'Nouvelle quantité en stock'}[t];
+ sheet({in:'Entrée de stock',out:'Sortie de stock',adj:'Ajustement'}[t]+' — '+E(p.name),F('m_q',L,t=='adj'?p.q:'','number','inputmode="decimal" min="0"')+F('m_n','Note (facultatif)','')+`<button class="btn" data-a="mok" data-i="${id}" data-t="${t}">Valider</button>`)}
+function mok(id,t){const p=prod(id),q=+$('#m_q').value;if($('#m_q').value===''||q<0||(t!='adj'&&q<=0))return toast('Quantité invalide');const n=$('#m_n').value.trim();
+ if(t=='in')mv(p,q,'in',n);else if(t=='out'){if(q>p.q)return toast('Stock insuffisant ('+p.q+')');mv(p,-q,'out',n||'Sortie')}else mv(p,q-p.q,'adj',n||'Inventaire');save();pdet(id);render()}
+function cform(){sheet('Nouveau client',F('k_n','Nom *','')+F('k_p','Téléphone','','tel')+`<button class="btn" data-a="csv">Enregistrer</button>`)}
+function cdet(id){const c=cust(id),b=bal(c),ss=D.s.filter(s=>s.cid==id).slice(0,15);
+ sheet(E(c.name),`<div class="card"><div class="k">Reste à payer</div><div class="v ${b>0?'er':'ok'}">${M(b)}</div><small>${E(c.ph||'')}</small></div>${b>0?`<div class="card">${F('p_a','Montant encaissé','','number','inputmode="decimal" min="0"')}<button class="btn o" data-a="cpay" data-i="${id}">Encaisser le paiement</button></div>`:''}
+ <div class="card"><b>Achats</b>${ss.map(s=>`<div class="row" data-a="sale" data-i="${s.id}"><div class="g"><b>${s.no}</b><small>${s.at.slice(0,10)}${s.st=='x'?' · annulée':''}</small></div><div style="text-align:right"><b>${M(s.total)}</b><br><small>${s.st=='ok'&&s.total-s.paid>0?'reste '+M(s.total-s.paid):''}</small></div></div>`).join('')||empty('Aucun achat')}</div>
+ <div class="card"><b>Paiements reçus</b>${(c.pay||[]).slice().reverse().slice(0,15).map(p=>`<div class="row"><div class="g">${p.at}</div><b class="ok">${M(p.amt)}</b></div>`).join('')||empty('Aucun paiement')}</div><button class="btn d" data-a="cdel" data-i="${id}">Supprimer le client</button>`)}
+function sale(id){const s=D.s.find(x=>x.id==id),c=cust(s.cid);
+ sheet(s.no+(s.st=='x'?' (annulée)':''),`<pre>${E(receipt(s))}</pre><div class="bar"><button class="btn" data-a="share" data-i="${id}">Partager le ticket</button>${s.st=='ok'?`<button class="btn d" data-a="scancel" data-i="${id}">Annuler la vente</button>`:''}</div>`)}
+function receipt(s){const c=cust(s.cid),w=32,l=(a,b)=>a+' '.repeat(Math.max(1,w-a.length-b.length))+b;
+ return [D.cfg.name,'N° '+s.no+' · '+s.at,c?'Client : '+c.name:'','-'.repeat(w),...s.items.map(i=>i.name+'\n'+l('  '+i.q+' x '+M(i.pr),M(i.q*i.pr))),'-'.repeat(w),s.disc?l('Remise','-'+M(s.disc)):'',l('TOTAL',M(s.total)),l('Paiement',MT[s.mt]),l('Payé',M(s.paid)),s.total-s.paid>0?l('Reste à payer',M(s.total-s.paid)):'','','Merci de votre visite'].filter(x=>x!=='').join('\n')}
+
+/* ---------- caisse ---------- */
+function add(id){const p=prod(id),l=cart.find(i=>i.pid==id),n=(l?l.q:0)+1;if(n>p.q)return toast('Stock insuffisant ('+p.q+' disponible)');l?l.q=n:cart.push({pid:id,q:1,pr:p.sp});cartBar();navigator.vibrate&&navigator.vibrate(15);toast(p.name+' ajouté')}
+function cartSheet(){const sub=cart.reduce((a,i)=>a+i.q*i.pr,0),d=Math.min(+PAY.disc||0,sub),tot=r2(sub-d);
+ sheet('Panier',cart.map(i=>{const p=prod(i.pid);return `<div class="row"><div class="g"><b>${E(p.name)}</b><small>${M(i.pr)}</small></div><div class="qty"><button data-a="cq" data-i="${i.pid}" data-d="-1">−</button><b>${i.q}</b><button data-a="cq" data-i="${i.pid}" data-d="1">+</button></div><b style="min-width:76px;text-align:right">${M(i.q*i.pr)}</b></div>`}).join('')+
+ `<label style="display:block;margin-top:10px">Remise (DA)</label><input id="x_d" type="number" inputmode="decimal" min="0" value="${PAY.disc}"><div class="seg">${Object.entries(MT).map(([k,v])=>`<button data-a="pm" data-i="${k}" class="${PAY.mt==k?'on':''}">${v}</button>`).join('')}</div>
+ ${PAY.mt=='credit'?`<label>Client *</label><select id="x_c"><option value="">— choisir —</option>${D.c.map(c=>`<option value="${c.id}" ${PAY.cid==c.id?'selected':''}>${E(c.name)}</option>`).join('')}</select><button class="btn g s" data-a="cform" style="margin-bottom:10px">＋ Nouveau client</button><label>Acompte versé (DA)</label><input id="x_p" type="number" inputmode="decimal" min="0" value="${PAY.paid}">`:''}
+ <div class="card"><div class="k">Total à payer</div><div class="v">${M(tot)}</div></div><button class="btn o" data-a="pay">Valider la vente</button>`)}
+function pay(){const sub=cart.reduce((a,i)=>a+i.q*i.pr,0),d=Math.min(Math.max(+$('#x_d').value||0,0),sub),tot=r2(sub-d),mt=PAY.mt,cid=mt=='credit'?+($('#x_c').value||0):null;
+ if(!cart.length)return toast('Panier vide');if(mt=='credit'&&!cid)return toast('Choisissez un client');
+ const paid=mt=='credit'?Math.min(Math.max(+$('#x_p').value||0,0),tot):tot;
+ for(const i of cart){const p=prod(i.pid);if(i.q>p.q)return toast('Stock insuffisant : '+p.name)}
+ const id=nid(),s={id,no:'V'+String(id).padStart(5,'0'),at:dt(),cid,items:cart.map(i=>{const p=prod(i.pid);return{pid:p.id,name:p.name,q:i.q,pr:i.pr,cost:p.pp}}),disc:d,total:tot,paid,mt,st:'ok'};
+ s.items.forEach(i=>mv(prod(i.pid),-i.q,'sale',s.no));D.s.unshift(s);save();cart=[];PAY={mt:'cash',cid:'',paid:'',disc:''};render();
+ sheet('Vente enregistrée ✓',`<pre>${E(receipt(s))}</pre><div class="bar"><button class="btn" data-a="share" data-i="${id}">Partager</button><button class="btn g" data-a="close">Nouvelle vente</button></div>`)}
+/* ---------- scan caméra ---------- */
+let stream=null,scanOn=false;
+function stopCam(){scanOn=false;if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}}
+async function cam(target){if(!('BarcodeDetector' in window)||!navigator.mediaDevices)return toast('Scan caméra non disponible ici : saisissez le code ou utilisez un lecteur Bluetooth/USB');
+ const FL=['f_n','f_b','f_c','f_pp','f_sp','f_q','f_m'],sv=target=='f'?FL.map(x=>$('#'+x)?.value):null;const back=c=>{pform(window._pid||'');if(sv)FL.forEach((x,i)=>$('#'+x).value=sv[i]);if(c)$('#f_b').value=c};sheet('Scanner un code-barres','<video id="cv" playsinline muted></video><p class="mu">Placez le code-barres devant la caméra.</p>');
+ try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});const v=$('#cv');v.srcObject=stream;await v.play();const det=new BarcodeDetector();scanOn=true;
+  while(scanOn){const r=await det.detect(v).catch(()=>[]);if(r.length){const code=r[0].rawValue;stopCam();if(target=='f'){back(code)}else{closeSheet();const p=D.p.find(x=>x.bc==code);p?add(p.id):toast('Code '+code+' inconnu')}return}await new Promise(r=>setTimeout(r,250))}}
+ catch(e){target=='f'?back():closeSheet();toast('Caméra inaccessible : autorisez-la dans le navigateur')}}
+
+/* ---------- actions ---------- */
+const act={
+close:closeSheet,tab(i){T=i;V=null;render()},sub(i){V=i;render()},pf(i){PF=!!i;render()},pform(i){window._pid=i||'';pform(i)},psave,pdet,smov(i,a,el){smov(i,el.dataset.t)},mok(i,a,el){mok(i,el.dataset.t)},
+pdel(i){if(confirm('Supprimer ce produit ?')){D.p=D.p.filter(p=>p.id!=i);save();closeSheet();render()}},add,cart:cartSheet,
+cq(i,a,el){const l=cart.find(x=>x.pid==i),p=prod(i),n=l.q+ +el.dataset.d;if(n>p.q)return toast('Stock insuffisant');if(n<=0)cart=cart.filter(x=>x.pid!=i);else l.q=n;PAY.disc=$('#x_d')?.value||'';cart.length?cartSheet():closeSheet();cartBar()},
+pm(i){PAY.disc=$('#x_d').value;PAY.mt=i;cartSheet()},pay,cam(i){cam(i)},
+cform(){cform()},csv(){const n=$('#k_n').value.trim();if(!n)return toast('Le nom est obligatoire');D.c.push({id:nid(),name:n,ph:$('#k_p').value.trim(),pay:[]});save();closeSheet();render();toast('Client ajouté')},
+cdet,cdel(i){const c=cust(i);if(bal(c)>0)return toast('Ce client a une dette en cours');if(confirm('Supprimer ce client ?')){D.c=D.c.filter(x=>x.id!=i);save();closeSheet();render()}},
+cpay(i){const c=cust(i),a=r2(+$('#p_a').value),b=bal(c);if(!(a>0))return toast('Montant invalide');if(a>b+.004)return toast('Dépasse la dette ('+M(b)+')');let left=a;
+ D.s.filter(s=>s.cid==i&&s.st=='ok'&&s.total-s.paid>0).reverse().forEach(s=>{const ap=Math.min(left,r2(s.total-s.paid));if(ap>0){s.paid=r2(s.paid+ap);left=r2(left-ap)}});(c.pay=c.pay||[]).push({at:dt(),amt:a});save();cdet(i);render();toast('Paiement enregistré')},
+sale,share(i){const s=D.s.find(x=>x.id==i),t=receipt(s);navigator.share?navigator.share({text:t}).catch(()=>{}):navigator.clipboard?.writeText(t).then(()=>toast('Ticket copié'))},
+scancel(i){if(!confirm('Annuler cette vente ? Le stock sera remis.'))return;const s=D.s.find(x=>x.id==i);s.items.forEach(l=>{const p=prod(l.pid);if(p)mv(p,l.q,'ret','Annulation '+s.no)});s.st='x';save();closeSheet();render();toast('Vente annulée, stock restauré')},
+eform(){sheet('Nouvelle dépense',F('e_l','Libellé *','')+F('e_a','Montant *','','number','inputmode="decimal" min="0"')+F('e_c','Catégorie (loyer, électricité…)','')+F('e_d','Date',td(),'date')+`<button class="btn" data-a="esave">Enregistrer</button>`)},
+esave(){const l=$('#e_l').value.trim(),a=r2($('#e_a').value);if(!l||!(a>0))return toast('Libellé et montant requis');D.e.unshift({id:nid(),label:l,amt:a,cat:$('#e_c').value.trim(),at:$('#e_d').value||td()});D.e.sort((x,y)=>y.at.localeCompare(x.at));save();closeSheet();render()},
+edel(i){if(confirm('Supprimer cette dépense ?')){D.e=D.e.filter(e=>e.id!=i);save();render()}},
+rmode(i){RM=i;RD=td();render()},
+export(){const b=new Blob([JSON.stringify(D)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='sauvegarde-'+td()+'.json';document.body.appendChild(a);a.click();a.remove();toast('Sauvegarde exportée')},
+csave(){D.cfg.name=$('#c_name').value.trim()||'Mon magasin';D.cfg.low=+$('#c_low').value||0;save();toast('Paramètres enregistrés');render()},
+reset(){if(confirm('Effacer TOUTES les données ?')&&confirm('Vraiment ? Cette action est définitive.')){D={p:[],c:[],s:[],e:[],m:[],cfg:{name:'Mon magasin',low:5},n:1};cart=[];save();V=null;T='home';render()}}
+};
+document.addEventListener('click',e=>{const el=e.target.closest('[data-a]');if(el&&act[el.dataset.a]){act[el.dataset.a](el.dataset.i,e,el)}else if(e.target.id=='ov')closeSheet()});
+$('#hb').onclick=()=>{V=null;render()};
+document.addEventListener('input',e=>{if(e.target.id=='qs')fill();if(e.target.id=='rd'){RD=e.target.value||RD;if(RM=='m')RD=RD+'-01';$('#rb').innerHTML=repBody()}});
+document.addEventListener('change',e=>{if(e.target.id=='imp'){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!x.p||!x.s||!x.c)throw 0;if(confirm('Remplacer les données actuelles par cette sauvegarde ?')){D=x;save();toast('Sauvegarde restaurée');V=null;T='home';render()}}catch(_){toast('Fichier invalide')}};r.readAsText(f)}});
+document.addEventListener('keydown',e=>{if(T=='pos'&&!V&&!$('#ov.on')&&e.target==document.body&&e.key.length==1&&!e.ctrlKey&&!e.metaKey)$('#qs')?.focus();if(e.key=='Enter'&&e.target.id=='qs'&&T=='pos'&&!V){e.preventDefault();const s=e.target.value.trim(),p=D.p.find(x=>x.bc&&x.bc==s)||(D.p.filter(x=>x.name.toLowerCase().includes(s.toLowerCase())).length==1?D.p.find(x=>x.name.toLowerCase().includes(s.toLowerCase())):null);if(p){add(p.id);e.target.value='';fill()}else toast('Aucun produit unique trouvé')}
+ if(e.key=='Enter'&&e.target.id=='f_b')e.preventDefault()});
+render();
+</script></body></html>

@@ -1,0 +1,32 @@
+{
+  "name": "gestion-stock-pro",
+  "productName": "Gestion Stock Pro",
+  "version": "1.0.0",
+  "description": "Gestion de stock et de ventes pour petit magasin (hors ligne)",
+  "main": "main.js",
+  "author": "Gestion Stock Pro",
+  "license": "UNLICENSED",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win nsis --x64 --publish never"
+  },
+  "devDependencies": {
+    "electron": "31.7.7",
+    "electron-builder": "24.13.3"
+  },
+  "build": {
+    "appId": "dz.gestionstockpro.app",
+    "productName": "Gestion Stock Pro",
+    "directories": { "output": "dist" },
+    "files": ["main.js", "preload.js", "app.html", "package.json"],
+    "win": { "target": "nsis", "signAndEditExecutable": false },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "artifactName": "Gestion-Stock-Pro-Setup.${ext}"
+    }
+  }
+}
